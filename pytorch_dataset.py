@@ -119,7 +119,7 @@ class GeoLifeCLEF2022Dataset(Dataset):
 
         if self.training_data:
             # torch.tensor(df["species_id"].values, dtype = torch.long)
-            self.targets = df['species_id'].values
+            self.targets = df['genus_id'].values
         else:
             self.targets = None
 
@@ -165,7 +165,7 @@ class GeoLifeCLEF2022Dataset(Dataset):
         # Extracting patch from rasters
         if self.patch_extractor is not None:
             # this will have all the bioclimatic or pedologic rasters for the specific lat, long position
-            print(observation_id, latitude, longitude)
+            #print(observation_id, latitude, longitude)
             environmental_patches = self.patch_extractor[(latitude, longitude)]
             # patches = patches + torch.from_numpy(np.array(environmental_patches))
             # convert list to pytorch tensor

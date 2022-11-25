@@ -40,7 +40,8 @@ dataset = GeoLifeCLEF2022Dataset(DATA_PATH, subset="train",
                                  transform=None,
                                  patch_extractor=extractor_bio)
 
-N_classes = 17036
+#N_classes = 17036
+N_classes = 1215
 train_size = int(0.8 * len(dataset))
 val_size = len(dataset) - train_size
 
