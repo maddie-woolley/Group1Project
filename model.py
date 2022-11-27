@@ -23,23 +23,23 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 print(device)
 
 
-DATA_PATH = Path("D:\geolifeclef_data")
+DATA_PATH = Path("/Volumes/ExtDrive/Group1Project/data/")
 le = LabelEncoder()
 
 extractor_bio = PatchExtractor(DATA_PATH / "rasters", size=256)
-extractor_bio.add_all_bioclimatic_rasters()
+#extractor_bio.add_all_bioclimatic_rasters()
 extractor_bio.append('sndppt')
 print("Number of rasters: {}".format(len(extractor_bio)))
 
 dataset = GeoLifeCLEF2022Dataset(DATA_PATH, subset="train",
                                  region='us',
-                                 patch_data='altitude',
+                                 patch_data=['altitude', 'near_ir'],
                                  use_rasters=True,
                                  # transform=get_train_transforms(),
                                  transform=None,
                                  patch_extractor=extractor_bio)
 
-N_classes = 17036
+N_classes = 1215
 train_size = int(0.8 * len(dataset))
 val_size = len(dataset) - train_size
 
@@ -51,7 +51,26 @@ val_loader = DataLoader(val_dataset, batch_size=16, num_workers=0, shuffle=False
 class ResNetGeolife(ResNet):
     def __init__(self):
         super().__init__(BasicBlock, [3, 4, 6, 3], num_classes=N_classes)
-        self.conv1 = nn.Conv2d(20, 64, kernel_size=7, stride=1, padding=3, bias=False)
+        self.conv1 = nn.Conv2d(16, 64, kernel_size=7, stride=1, padding=3, bias=False)
+        
+    # def forward(self, altitude, near_ir):
+    #     conv1_altitude = nn.Conv2d(20, 64, kernel_size=7, stride=1, padding=3, bias=False)
+    #     altitude = conv1_altitude(altitude)
+        
+    #     conv1_near_ir = nn.Conv2d(256, 64, kernel_size=7, stride=1, padding=3, bias=False)
+    #     near_ir = conv1_near_ir(near_ir)
+        
+    #     altitude = super().forward(altitude)
+    #     near_ir = super().forward(near_ir)
+        
+    #     output = torch.cat((altitude, near_ir), 1)
+    #     return output
+    
+    def forward(self, inputs):
+        conv_layer = nn.Conv2d(2, 16, kernel_size=7, stride=1, padding=3, bias=False)
+        inputs = conv_layer(inputs)
+        
+        return super().forward(inputs)
 
 
 net = ResNetGeolife().to(device)
@@ -77,7 +96,7 @@ def train(model, optimizer, train_loader, val_loader, epochs=2, device='cpu'):
             inputs, targets = batch
             inputs = inputs.float()
             targets = targets.to(device)
-
+                        
             inputs = torch.nan_to_num(inputs)
             inputs_m, inputs_s = inputs.mean(), inputs.std()
             inputs = (inputs - inputs_m) / inputs_s
@@ -130,7 +149,7 @@ def train(model, optimizer, train_loader, val_loader, epochs=2, device='cpu'):
               'accuracy = {:.2f}'.format(epoch + 1, training_loss, valid_loss, x))
 
 
-print(torch.cuda.get_device_name(0))
+#print(torch.cuda.get_device_name(0))
 print(device)
 gc.collect()
 train(model.to(device), optimizer, train_loader, val_loader, epochs=2, device=device)

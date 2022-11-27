@@ -175,7 +175,7 @@ class GeoLifeCLEF2022Dataset(Dataset):
             # environmental_patches = torch.from_numpy(environmental_patches)
             # print (patches.shape)
             # print (environmental_patches.shape)  # 20,256,256
-            patches = patches + torch.Tensor(environmental_patches)
+            #patches = patches + torch.Tensor(environmental_patches)
 
         # Concatenate all patches into a single tensor
         if len(patches) == 1:
