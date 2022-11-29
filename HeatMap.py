@@ -1,3 +1,7 @@
+# Pointer, I. (2018, January 23). Class Activation Mapping In PyTorch. 
+Retrieved November 29, 2022, 
+from https://snappishproductions.com/blog/2018/01/03/class-activation-mapping-in-pytorch.html
+
 from PIL import Image
 from matplotlib.pyplot import imshow
 from torchvision import models, transforms
